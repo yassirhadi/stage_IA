@@ -7,6 +7,7 @@ import com.copilot.rssi.entity.AnalysisResult;
 import com.copilot.rssi.entity.Document;
 import com.copilot.rssi.entity.Recommendation;
 import com.copilot.rssi.entity.Risk;
+import com.copilot.rssi.entity.enums.AnalysisStatus;
 import com.copilot.rssi.entity.enums.RiskStatus;
 import com.copilot.rssi.repository.AnalysisResultRepository;
 import com.copilot.rssi.repository.DocumentRepository;
@@ -85,26 +86,75 @@ public class InventoryController {
     @Operation(summary = "Lister tous les documents inventoriés")
     @Transactional(readOnly = true)
     public ApiResponse<List<Map<String, Object>>> getDocuments() {
-        List<Object[]> documents = documentRepository.findAllNative();
+        List<Document> documents = documentRepository.findAll();
         List<Map<String, Object>> result = documents.stream()
-            .map(row -> {
-                Map<String, Object> map = new java.util.HashMap<>();
-                map.put("id", row[0]);
-                map.put("fileName", row[1]);
-                map.put("filePath", row[2]);
-                map.put("extension", row[3]);
-                map.put("fileSize", row[4]);
-                map.put("mimeType", row[5]);
-                map.put("createdDate", row[6]);
-                map.put("modifiedDate", row[7]);
-                map.put("documentType", row[8]);
-                map.put("confidentialityLevel", row[9]);
-                map.put("analysisStatus", row[10]);
-                map.put("createdAt", row[11]);
-                return map;
-            })
+            .map(this::toDocumentListItem)
             .collect(Collectors.toList());
         return ApiResponse.ok(result);
+    }
+
+    private Map<String, Object> toDocumentListItem(Document document) {
+        Map<String, Object> map = new java.util.HashMap<>();
+        Long documentId = document.getId();
+
+        map.put("id", documentId);
+        map.put("fileName", document.getFileName());
+        map.put("filePath", document.getFilePath());
+        map.put("extension", document.getExtension());
+        map.put("fileSize", document.getFileSize());
+        map.put("mimeType", document.getMimeType());
+        map.put("createdDate", document.getCreatedDate());
+        map.put("modifiedDate", document.getModifiedDate());
+        map.put("documentType", document.getDocumentType());
+        map.put("confidentialityLevel", document.getConfidentialityLevel());
+        map.put("analysisStatus", document.getAnalysisStatus());
+        map.put("createdAt", document.getCreatedAt());
+        map.put("updatedAt", document.getUpdatedAt());
+        map.put("extractedText", document.getExtractedText());
+
+        AnalysisResult analysisResult = analysisResultRepository
+                .findFirstByDocumentIdOrderByCreatedAtDesc(documentId)
+                .orElse(null);
+
+        long sensitiveDataCount = sensitiveDataRepository.countByDocumentId(documentId);
+        long recommendationsCount = recommendationRepository.countByDocumentId(documentId);
+
+        Integer securityScore = analysisResult != null ? analysisResult.getSecurityScore() : null;
+        int riskScore = 0;
+        if (document.getAnalysisStatus() == AnalysisStatus.COMPLETED && securityScore != null) {
+            riskScore = Math.max(0, Math.min(100, 100 - securityScore));
+        }
+
+        map.put("securityScore", securityScore);
+        map.put("riskScore", riskScore);
+        map.put("detectedDataTypes", analysisResult != null ? analysisResult.getDetectedDataTypes() : null);
+        map.put("sensitiveDataCount", sensitiveDataCount);
+        map.put("recommendationsCount", recommendationsCount);
+        map.put("risksCount", analysisResult != null ? analysisResult.getRisksCount() : 0);
+        map.put("risksDetails", analysisResult != null ? analysisResult.getRisksDetails() : null);
+        map.put("complianceStandards", analysisResult != null ? analysisResult.getComplianceStandards() : null);
+        map.put("piiDetected", analysisResult != null ? analysisResult.getPiiDetected() : false);
+        map.put("analysedAt", analysisResult != null ? analysisResult.getCreatedAt() : null);
+        map.put("detectedDocumentType", analysisResult != null ? analysisResult.getDocumentType() : null);
+        map.put("detectedConfidentialityLevel", analysisResult != null ? analysisResult.getConfidentialityLevel() : null);
+        map.put("sensitiveData", buildSensitiveDataList(documentId));
+
+        return map;
+    }
+
+    private List<Map<String, String>> buildSensitiveDataList(Long documentId) {
+        return sensitiveDataRepository.findByDocumentId(documentId).stream()
+                .map(item -> {
+                    Map<String, String> entry = new java.util.HashMap<>();
+                    entry.put("type", item.getDataType() != null ? item.getDataType().name() : "AUTRE");
+                    String masked = item.getMaskedValue();
+                    if (masked == null || masked.isBlank()) {
+                        masked = item.getDetectedValue() != null ? "********" : "N/A";
+                    }
+                    entry.put("value", masked);
+                    return entry;
+                })
+                .toList();
     }
 
     @GetMapping("/sensitive-data")

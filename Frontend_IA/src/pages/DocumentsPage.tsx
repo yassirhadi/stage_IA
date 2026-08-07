@@ -23,7 +23,9 @@ interface Document {
   sensitiveData?: Array<{ type: string; value: string }>;
   analysisError?: string;
   riskScore?: number;
+  securityScore?: number;
   detectedDataTypes?: string;
+  sensitiveDataCount?: number;
   recommendationsCount?: number;
 }
 
@@ -54,6 +56,36 @@ const STATUS_OPTIONS = [
   'Non analysé'
 ];
 
+const DOCUMENT_TYPE_LABELS: Record<string, string> = {
+  CONTRAT: 'Contrat',
+  FACTURE: 'Facture',
+  RAPPORT: 'Rapport',
+  PROCEDURE: 'Procédure',
+  POLITIQUE_SSI: 'Politique SSI',
+  DOSSIER_RH: 'Dossier RH',
+  NOTE_INTERNE: 'Note interne',
+  AUTRE: 'Autre',
+};
+
+const mapAnalysisStatus = (status?: string): Document['analysisStatus'] => {
+  switch ((status || '').toUpperCase()) {
+    case 'IN_PROGRESS':
+      return 'En cours';
+    case 'COMPLETED':
+      return 'Terminé';
+    case 'FAILED':
+      return 'Échec';
+    case 'PENDING':
+    default:
+      return 'Non analysé';
+  }
+};
+
+const mapDocumentType = (type?: string): string => {
+  if (!type) return 'Autre';
+  return DOCUMENT_TYPE_LABELS[type.toUpperCase()] || type;
+};
+
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
@@ -82,11 +114,21 @@ export default function DocumentsPage() {
       const data = Array.isArray(res.data.data) ? res.data.data : [];
       setDocuments(data.map((doc: any) => ({
         ...doc,
-        analysisStatus: doc.analysisStatus || 'Non analysé',
-        sensitiveData: doc.detectedDataTypes ? doc.detectedDataTypes.split(',').map((item: string) => ({
-          type: item.trim(),
-          value: '********'
-        })) : []
+        documentType: mapDocumentType(doc.documentType),
+        analysisStatus: mapAnalysisStatus(doc.analysisStatus),
+        riskScore: typeof doc.riskScore === 'number' ? doc.riskScore : 0,
+        sensitiveDataCount: typeof doc.sensitiveDataCount === 'number'
+          ? doc.sensitiveDataCount
+          : (Array.isArray(doc.sensitiveData) ? doc.sensitiveData.length : 0),
+        recommendationsCount: typeof doc.recommendationsCount === 'number' ? doc.recommendationsCount : 0,
+        sensitiveData: Array.isArray(doc.sensitiveData)
+          ? doc.sensitiveData
+          : (doc.detectedDataTypes
+            ? doc.detectedDataTypes.split(',').map((item: string) => ({
+                type: item.trim(),
+                value: 'Masqué'
+              })).filter((item: { type: string }) => item.type)
+            : [])
       })));
     } catch (error) {
       console.error('Error loading documents:', error);
@@ -328,13 +370,15 @@ export default function DocumentsPage() {
             </thead>
             <tbody className="divide-y">
               {paginatedDocuments.map((doc) => {
-                const sensitiveDataCount = doc.detectedDataTypes ? doc.detectedDataTypes.split(',').filter(t => t.trim()).length : 0;
+                const sensitiveDataCount = doc.sensitiveDataCount ?? doc.sensitiveData?.length ?? 0;
                 const analysisResult = doc.analysisStatus === 'Terminé' 
-                  ? (sensitiveDataCount > 0 ? 'Risques détectés' : 'Aucun risque')
+                  ? (sensitiveDataCount > 0 || (doc.riskScore || 0) > 0 ? 'Risques détectés' : 'Aucun risque')
                   : doc.analysisStatus === 'Échec' 
                   ? 'Erreur'
                   : doc.analysisStatus;
-                const riskScore = doc.riskScore !== undefined ? `${doc.riskScore}%` : '0%';
+                const riskScore = doc.analysisStatus === 'Terminé'
+                  ? `${doc.riskScore ?? 0}%`
+                  : '—';
                 
                 return (
                   <tr key={doc.id} className="hover:bg-muted/30">
@@ -360,6 +404,7 @@ export default function DocumentsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className={`font-medium ${
+                        doc.analysisStatus !== 'Terminé' ? 'text-zinc-400' :
                         (doc.riskScore || 0) >= 70 ? 'text-red-600' :
                         (doc.riskScore || 0) >= 40 ? 'text-yellow-600' :
                         'text-green-600'
@@ -367,8 +412,8 @@ export default function DocumentsPage() {
                         {riskScore}
                       </span>
                     </td>
-                    <td className="px-4 py-3">{sensitiveDataCount}</td>
-                    <td className="px-4 py-3">{doc.recommendationsCount || 0}</td>
+                    <td className="px-4 py-3">{doc.analysisStatus === 'Terminé' ? sensitiveDataCount : '—'}</td>
+                    <td className="px-4 py-3">{doc.analysisStatus === 'Terminé' ? (doc.recommendationsCount ?? 0) : '—'}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(doc.analysisStatus)}`}>
                         {doc.analysisStatus}
@@ -484,8 +529,25 @@ export default function DocumentsPage() {
                 <h3 className="font-semibold mb-3 text-zinc-200">Résultats de l'analyse IA</h3>
                 <div className="space-y-3 text-sm">
                   <div>
+                    <span className="text-zinc-400">Score risque:</span>
+                    <span className={`ml-2 font-medium ${
+                      selectedDocument.analysisStatus !== 'Terminé' ? 'text-zinc-400' :
+                      (selectedDocument.riskScore || 0) >= 70 ? 'text-red-400' :
+                      (selectedDocument.riskScore || 0) >= 40 ? 'text-yellow-400' :
+                      'text-green-400'
+                    }`}>
+                      {selectedDocument.analysisStatus === 'Terminé' ? `${selectedDocument.riskScore ?? 0}%` : 'Non calculé'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-400">Recommandations:</span>
+                    <span className="ml-2 font-medium text-zinc-100">
+                      {selectedDocument.analysisStatus === 'Terminé' ? (selectedDocument.recommendationsCount ?? 0) : '—'}
+                    </span>
+                  </div>
+                  <div>
                     <span className="text-zinc-400">Type détecté par l'IA:</span>
-                    <span className="ml-2 font-medium text-zinc-100">{selectedDocument.detectedDocumentType || selectedDocument.documentType || 'Autre'}</span>
+                    <span className="ml-2 font-medium text-zinc-100">{mapDocumentType(selectedDocument.detectedDocumentType || selectedDocument.documentType)}</span>
                   </div>
                   <div>
                     <span className="text-zinc-400">Niveau de confidentialité détecté:</span>

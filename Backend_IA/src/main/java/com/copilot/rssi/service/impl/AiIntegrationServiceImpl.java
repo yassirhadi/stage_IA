@@ -59,6 +59,9 @@ public class AiIntegrationServiceImpl implements AiIntegrationService {
             }
             Map<String, Object> result = callAnalyzeApi(actualPath.toString());
             if (result.containsKey("error")) {
+                log.error("Service IA indisponible pour {}: {}", document.getFileName(), result.get("error"));
+                document.setAnalysisStatus(AnalysisStatus.FAILED);
+                documentRepository.save(document);
                 throw new IllegalStateException("Service IA indisponible: " + result.get("error"));
             }
             applyAnalysisResult(document, result);
@@ -266,7 +269,13 @@ public class AiIntegrationServiceImpl implements AiIntegrationService {
             : standardsValue != null ? standardsValue.toString() : "";
         Object scoreValue = result.get("security_score");
         if (scoreValue == null) scoreValue = result.get("securityScore");
-        Integer securityScore = scoreValue != null ? Integer.valueOf(scoreValue.toString()) : 0;
+        Integer securityScore = scoreValue != null
+                ? Integer.valueOf(scoreValue.toString())
+                : calculateSecurityScore(result, sensitiveItems, risks);
+        
+        if (scoreValue == null) {
+            log.warn("AI payload missing security score for document {}. Computed fallback score {}.", document.getId(), securityScore);
+        }
         
         System.out.println("=== SAVING ANALYSIS RESULT ===");
         System.out.println("Document ID: " + document.getId());
@@ -294,6 +303,60 @@ public class AiIntegrationServiceImpl implements AiIntegrationService {
         analysisResult.setDetectedDataTypes(detectedDataTypes);
         analysisResult.setRisksDetails(risksDetails);
         analysisResultRepository.save(analysisResult);
+    }
+
+    private Integer calculateSecurityScore(Map<String, Object> result,
+                                            List<Map<String, Object>> sensitiveItems,
+                                            List<Map<String, Object>> risks) {
+        int baseScore = 100;
+        int sensitiveDataDeduction = sensitiveItems != null ? sensitiveItems.size() * 5 : 0;
+
+        int risksDeduction = 0;
+        if (risks != null) {
+            for (Map<String, Object> risk : risks) {
+                String severity = getString(risk, "severity", null).toUpperCase(Locale.ROOT);
+                if ("CRITIQUE".equals(severity)) {
+                    risksDeduction += 20;
+                } else if ("ELEVE".equals(severity) || "ELEVÉ".equals(severity) || "ÉLEVÉ".equals(severity)) {
+                    risksDeduction += 15;
+                } else if ("MOYEN".equals(severity)) {
+                    risksDeduction += 10;
+                } else if ("FAIBLE".equals(severity)) {
+                    risksDeduction += 5;
+                }
+            }
+        }
+
+        int confidentialityAdjustment = 0;
+        Object confLevel = result.get("confidentiality_level");
+        if (confLevel == null) confLevel = result.get("confidentialityLevel");
+        String confidentiality = confLevel != null ? confLevel.toString().toUpperCase(Locale.ROOT) : null;
+        if ("PUBLIC".equals(confidentiality)) {
+            confidentialityAdjustment = 5;
+        } else if ("INTERNE".equals(confidentiality)) {
+            confidentialityAdjustment = 0;
+        } else if ("CONFIDENTIEL".equals(confidentiality)) {
+            confidentialityAdjustment = -5;
+        } else if ("TRES_CONFIDENTIEL".equals(confidentiality) || "TRÈS_CONFIDENTIEL".equals(confidentiality)) {
+            confidentialityAdjustment = -10;
+        }
+
+        int typeAdjustment = 0;
+        Object docType = result.get("document_type");
+        if (docType == null) docType = result.get("documentType");
+        String documentType = docType != null ? docType.toString().toUpperCase(Locale.ROOT).replace(" ", "_") : null;
+        if ("DOSSIER_RH".equals(documentType) || "RH".equals(documentType)) {
+            typeAdjustment = -5;
+        } else if ("CONTRAT".equals(documentType)) {
+            typeAdjustment = -3;
+        } else if ("FACTURE".equals(documentType)) {
+            typeAdjustment = -4;
+        } else if ("POLITIQUE_SSI".equals(documentType) || "POLITIQUE_SECURITE".equals(documentType)) {
+            typeAdjustment = 5;
+        }
+
+        int securityScore = baseScore - sensitiveDataDeduction - risksDeduction + confidentialityAdjustment + typeAdjustment;
+        return Math.max(0, Math.min(100, securityScore));
     }
 
     private void saveSensitiveData(Document document, Map<String, Object> item) {
@@ -374,8 +437,12 @@ public class AiIntegrationServiceImpl implements AiIntegrationService {
     private void saveRecommendation(Risk risk, Map<String, Object> recData) {
         String description = normalizeText(getString(recData, "description", null));
         if (description.isBlank()) {
+            description = normalizeText(getString(recData, "recommendation", null));
+        }
+        if (description.isBlank()) {
             return;
         }
+        final String normalizedDescription = description;
         String priorityStr = recData.get("priority") != null ? recData.get("priority").toString() : "MOYENNE";
         RecommendationPriority priority;
         try {
@@ -386,7 +453,7 @@ public class AiIntegrationServiceImpl implements AiIntegrationService {
 
         List<Recommendation> existingRecommendations = recommendationRepository.findByRiskId(risk.getId());
         Optional<Recommendation> existing = existingRecommendations.stream()
-                .filter(rec -> description.equalsIgnoreCase(normalizeText(rec.getDescription())))
+                .filter(rec -> normalizedDescription.equalsIgnoreCase(normalizeText(rec.getDescription())))
                 .findFirst();
 
         if (existing.isPresent()) {

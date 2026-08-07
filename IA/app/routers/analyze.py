@@ -25,7 +25,9 @@ def _build_analysis(file_path: str) -> AnalyzeResponse:
     risks = risk_analyzer.analyze(text, document_type, confidentiality, sensitive_data)
     recommendations = recommendation_generator.generate(risks)
     severity_penalties = {"CRITIQUE": 35, "ELEVE": 20, "MOYEN": 10, "FAIBLE": 4}
-    security_score = max(0, 100 - sum(severity_penalties.get(r["severity"], 8) for r in risks))
+    risk_penalty = sum(severity_penalties.get(r["severity"], 8) for r in risks)
+    sensitive_penalty = min(len(sensitive_data) * 4, 20)
+    security_score = max(0, 100 - risk_penalty - sensitive_penalty)
     standards = ["ISO 27001"]
     if sensitive_data:
         standards.extend(["RGPD", "Loi 09-08"])
@@ -76,8 +78,8 @@ def analyze_document(request: AnalyzeRequest):
                 'confidentiality_level': analysis.confidentiality_level,
                 'sensitive_data': analysis.sensitive_data,
                 'risks': analysis.risks,
-                'compliance_standards': '',
-                'security_score': 0,
+                'compliance_standards': analysis.compliance_standards,
+                'security_score': analysis.security_score,
             })
         except Exception as e:
             # log but do not break API response
@@ -124,8 +126,8 @@ async def analyze_upload(file: UploadFile = File(...)):
                 'confidentiality_level': analysis.confidentiality_level,
                 'sensitive_data': analysis.sensitive_data,
                 'risks': analysis.risks,
-                'compliance_standards': '',
-                'security_score': 0,
+                'compliance_standards': analysis.compliance_standards,
+                'security_score': analysis.security_score,
             })
         except Exception:
             import logging

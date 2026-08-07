@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface SensitiveDataRepository extends JpaRepository<SensitiveData, Long> {
     List<SensitiveData> findByDocumentId(Long documentId);
+    long countByDocumentId(Long documentId);
     List<SensitiveData> findByDataType(SensitiveDataType dataType);
     void deleteByDocumentId(Long documentId);
 
