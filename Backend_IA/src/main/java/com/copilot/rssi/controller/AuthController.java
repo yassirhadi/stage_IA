@@ -58,28 +58,4 @@ public class AuthController {
     public ApiResponse<List<UserResponse>> getAllUsers() {
         return ApiResponse.ok(authService.getAllUsers());
     }
-
-    @PostMapping("/reset-password/{username}")
-    @Operation(summary = "Réinitialiser le mot de passe (Debug)")
-    public ApiResponse<String> resetPassword(@PathVariable String username) {
-        try {
-            authService.resetPasswordByUsername(username, "rssi123");
-            return ApiResponse.ok("Mot de passe réinitialisé à rssi123 pour " + username);
-        } catch (Exception e) {
-            return ApiResponse.error("Erreur lors de la réinitialisation: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/debug/users")
-    @Operation(summary = "Liste des utilisateurs (Debug - No Auth)")
-    public ApiResponse<String> debugUsers() {
-        try {
-            List<String> users = authService.getAllUsers().stream()
-                .map(u -> u.getUsername() + " - " + u.getRole())
-                .toList();
-            return ApiResponse.ok("Utilisateurs: " + String.join(", ", users));
-        } catch (Exception e) {
-            return ApiResponse.error("Erreur: " + e.getMessage());
-        }
-    }
 }
