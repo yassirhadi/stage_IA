@@ -43,11 +43,14 @@ def check_mysql():
         import mysql.connector
         from mysql.connector import Error
         
+        from app.config import settings
+
         connection = mysql.connector.connect(
-            host=os.getenv("MYSQL_HOST", "localhost"),
-            database=os.getenv("MYSQL_DATABASE", "copilot_rssi"),
-            user=os.getenv("MYSQL_USER", "root"),
-            password=os.getenv("MYSQL_PASSWORD", "")
+            host=settings.mysql_host,
+            port=settings.mysql_port,
+            database=settings.mysql_database,
+            user=settings.mysql_user,
+            password=settings.mysql_password,
         )
         
         if connection.is_connected():
