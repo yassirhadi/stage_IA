@@ -1,5 +1,5 @@
 -- Check current data status in database
-USE copilot_rssi;
+-- Sélectionnez votre base MySQL avant d’exécuter ce script.
 
 -- Check documents count
 SELECT 'documents' as table_name, COUNT(*) as count FROM documents;
