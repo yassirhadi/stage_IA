@@ -1,7 +1,7 @@
 -- Clean database (truncate tables)
 -- Run this to clear data before re-inserting
 
-USE copilot_rssi;
+-- Sélectionnez votre base MySQL avant d’exécuter ce script.
 
 -- Disable foreign key checks temporarily for truncation
 SET FOREIGN_KEY_CHECKS = 0;
