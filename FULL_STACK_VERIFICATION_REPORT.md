@@ -32,7 +32,7 @@ Server Configuration:
 ├── port: 8080
 ├── context-path: /api
 ├── active profile: dev
-├── database: MySQL (copilot_rssi)
+├── database: MySQL (configured using DB_URL)
 └── CORS: Allowed origins http://localhost:5173
 
 Security:
@@ -205,9 +205,9 @@ CORS Configuration: ✅ ENABLED
 └── Credentials: Allowed
 
 Test User Created:
-├── Username: rssi
+├── Username: set your own RSSI username
 ├── Role: RSSI
-└── Password: rssi123
+└── Password: set your own RSSI password
 ```
 
 ---
@@ -255,9 +255,9 @@ Result: ✅ 200 OK (or 500 if service issue, not path issue)
 
 ### Verified Database Operations
 ```
-MySQL Database: copilot_rssi
+MySQL Database: choose your own database in DB_URL
 Connection: ✅ Active
-Credentials: root:hadi
+Credentials: set your own DB_USERNAME and DB_PASSWORD
 
 Verified Operations:
 ├── SELECT: ✅ Inventory documents query working
@@ -267,7 +267,7 @@ Verified Operations:
 └── SELECT: ✅ Audit logs retrieval working
 
 Data Persistence: ✅ Confirmed
-├── Inventory stored in copilot_rssi database
+├── Inventory stored in the configured database
 ├── User sessions active
 └── JWT tokens valid
 ```
