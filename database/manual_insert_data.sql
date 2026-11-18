@@ -1,7 +1,7 @@
 -- Manual data insertion for RSSI tables
 -- Run this file manually if data.sql was not executed by Spring Boot
 
-USE copilot_rssi;
+-- Sélectionnez votre base MySQL avant d’exécuter ce script.
 
 -- 1. Insert documents (required for sensitive_data foreign key)
 INSERT IGNORE INTO documents (file_name, file_path, file_size, extension, document_type, confidentiality_level, analysis_status, created_at, updated_at) VALUES
