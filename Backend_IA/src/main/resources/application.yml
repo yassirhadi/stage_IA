@@ -33,7 +33,7 @@ server:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:CopilotRSSI2026SecretKeyForJWTTokenGenerationMustBeLongEnough256bits}
+    secret: ${JWT_SECRET}
     expiration-ms: 86400000
   ai-service:
     base-url: ${AI_SERVICE_URL:http://localhost:8000}
