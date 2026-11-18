@@ -57,47 +57,34 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initDefaultUsers() {
-        // Always reset passwords for debug purposes
-        Role adminRole = roleRepository.findByName(RoleName.ADMIN).orElseThrow();
-        Role rssiRole = roleRepository.findByName(RoleName.RSSI).orElseThrow();
+        initUser("BOOTSTRAP_ADMIN", RoleName.ADMIN, "Admin", "System");
+        initUser("BOOTSTRAP_RSSI", RoleName.RSSI, "Responsable", "SSI");
+    }
 
-        if (!userRepository.existsByUsername("admin")) {
-            userRepository.save(User.builder()
-                    .username("admin")
-                    .email("admin@copilot-rssi.ma")
-                    .password(passwordEncoder.encode("admin123"))
-                    .firstName("Admin")
-                    .lastName("System")
-                    .role(adminRole)
-                    .enabled(true)
-                    .build());
-            log.info("Utilisateur admin créé (admin / admin123)");
-        } else {
-            // Reset admin password
-            User admin = userRepository.findByUsername("admin").orElseThrow();
-            admin.setPassword(passwordEncoder.encode("admin123"));
-            userRepository.save(admin);
-            log.info("Mot de passe admin réinitialisé (admin / admin123)");
+    private void initUser(String prefix, RoleName roleName, String firstName, String lastName) {
+        String username = System.getenv().getOrDefault(prefix + "_USERNAME", "");
+        String password = System.getenv().getOrDefault(prefix + "_PASSWORD", "");
+        String email = System.getenv().getOrDefault(prefix + "_EMAIL", "");
+        if (username.isBlank() && password.isBlank() && email.isBlank()) {
+            return;
+        }
+        if (username.isBlank() || password.isBlank() || email.isBlank()) {
+            throw new IllegalStateException("Incomplete account configuration: " + prefix);
+        }
+        if (userRepository.existsByUsername(username)) {
+            return;
         }
 
-        if (!userRepository.existsByUsername("rssi")) {
-            userRepository.save(User.builder()
-                    .username("rssi")
-                    .email("rssi@copilot-rssi.ma")
-                    .password(passwordEncoder.encode("rssi123"))
-                    .firstName("Responsable")
-                    .lastName("SSI")
-                    .role(rssiRole)
-                    .enabled(true)
-                    .build());
-            log.info("Utilisateur RSSI créé (rssi / rssi123)");
-        } else {
-            // Reset rssi password
-            User rssi = userRepository.findByUsername("rssi").orElseThrow();
-            rssi.setPassword(passwordEncoder.encode("rssi123"));
-            userRepository.save(rssi);
-            log.info("Mot de passe RSSI réinitialisé (rssi / rssi123)");
-        }
+        Role role = roleRepository.findByName(roleName).orElseThrow();
+        userRepository.save(User.builder()
+                .username(username)
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .firstName(firstName)
+                .lastName(lastName)
+                .role(role)
+                .enabled(true)
+                .build());
     }
 
     private void initReferentials() {
