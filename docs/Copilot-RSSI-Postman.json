@@ -6,7 +6,11 @@
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:8080/api" },
-    { "key": "token", "value": "" }
+        { "key": "token", "value": "" },
+    { "key": "rssiUsername", "value": "" },
+    { "key": "rssiPassword", "value": "" },
+    { "key": "adminUsername", "value": "" },
+    { "key": "adminPassword", "value": "" }
   ],
   "item": [
     {
@@ -37,7 +41,7 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"username\": \"rssi\",\n  \"password\": \"rssi123\"\n}"
+                    "raw": "{\n  \"username\": \"{{rssiUsername}}\",\n  \"password\": \"{{rssiPassword}}\"\n}"
         },
         "url": "{{baseUrl}}/auth/login"
       }
@@ -49,7 +53,7 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+                    "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
         },
         "url": "{{baseUrl}}/auth/login"
       }
