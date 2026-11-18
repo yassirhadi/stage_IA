@@ -135,12 +135,7 @@ print(result['requires_referentiels'])  # False
 ```python
 from app.mysql_query_builder import MySQLQueryBuilder
 
-builder = MySQLQueryBuilder(
-    host="localhost",
-    database="copilot_rssi",
-    user="root",
-    password="your_password"
-)
+builder = MySQLQueryBuilder()  # Reads your local MySQL settings.
 
 # Build query
 query = builder.build_query('CIN', {})
@@ -325,16 +320,8 @@ pip install -r requirements.txt
 
 ### 2. Configure MySQL
 
-```bash
-# Create database
-mysql -u root -p < ../database/schema.sql
-
-# Set environment variables
-set MYSQL_HOST=localhost
-set MYSQL_DATABASE=copilot_rssi
-set MYSQL_USER=root
-set MYSQL_PASSWORD=your_password
-```
+1. Create and select a MySQL database with a name of your choice, then run `database/schema.sql` from your MySQL client.
+2. Copy `IA/.env.example` to `IA/.env`. Set `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USER` and `MYSQL_PASSWORD` to match your own installation.
 
 ### 3. Install and Start Ollama
 
