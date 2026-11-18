@@ -1,6 +1,6 @@
 -- Populate empty tables with realistic data
 
-USE copilot_rssi;
+-- Sélectionnez votre base MySQL avant d’exécuter ce script.
 
 -- 1. Populate settings table
 INSERT INTO settings (company_name, logo_url, language, timezone, email, storage_path, ocr_enabled) VALUES
