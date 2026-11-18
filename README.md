@@ -245,3 +245,8 @@ L'intelligence artificielle intervient comme outil d'assistance à la décision,
 Choisissez votre propre base MySQL. Indiquez son nom dans votre URL JDBC `DB_URL` et dans `MYSQL_DATABASE`. Renseignez votre utilisateur et mot de passe dans `DB_USERNAME` et `DB_PASSWORD`, puis définissez une clé `JWT_SECRET` propre à votre installation.
 
 Pour le service IA, copiez `IA/.env.example` vers `IA/.env`, puis renseignez `MYSQL_USER`, `MYSQL_PASSWORD` et `MYSQL_DATABASE`. Renseignez `OPENAI_API_KEY` si vous utilisez OpenAI. Gardez les valeurs personnelles sur votre machine.
+
+
+Pour créer le premier compte administrateur, définissez `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_PASSWORD` et `BOOTSTRAP_ADMIN_EMAIL` avant de lancer le backend. Pour un compte RSSI, utilisez `BOOTSTRAP_RSSI_USERNAME`, `BOOTSTRAP_RSSI_PASSWORD` et `BOOTSTRAP_RSSI_EMAIL`. Chaque groupe de trois variables est facultatif. Les comptes existants gardent leur mot de passe au redémarrage.
+
+Pour exécuter `TEST_FINAL.ps1`, fournissez votre jeton de test via `TEST_BEARER_TOKEN` ou le paramètre `-Token`.
