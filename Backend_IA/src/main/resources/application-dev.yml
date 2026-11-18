@@ -1,9 +1,11 @@
+
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/copilot_rssi?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: VOTRE_USER
-    password: VOTRE_MOT_DE_PASSE
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
