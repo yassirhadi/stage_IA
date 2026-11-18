@@ -1,6 +1,6 @@
 # Final Comprehensive Test - With Authentication
 param(
-    [string]$Token = "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiUk9MRV9SU1NJIiwic3ViIjoicnNzaSIsImlhdCI6MTc4MzE5MjM0NSwiZXhwIjoxNzgzMjc4NzQ1fQ.CR50l4fc_b2e5kSCWTSRhauzaO9C2r7jOMHzrK6kHbljsEAHPDTYlfXNNnfDp2_5qwlN2gxOGvTKLcL2pU_Odw"
+    [string]$Token = $env:TEST_BEARER_TOKEN
 )
 
 $BaseUrl = "http://localhost:8080/api"
