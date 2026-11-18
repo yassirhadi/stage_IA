@@ -7,13 +7,15 @@ from typing import Dict, List, Optional, Tuple
 import os
 
 class MySQLQueryBuilder:
-    def __init__(self, host: str = "localhost", database: str = "copilot_rssi",
-                 user: str = "root", password: str = ""):
-        """Initialize MySQL connection"""
-        self.host = host
-        self.database = database
-        self.user = user
-        self.password = password
+    def __init__(self, host: Optional[str] = None, database: Optional[str] = None,
+                 user: Optional[str] = None, password: Optional[str] = None):
+        """Initialize MySQL connection settings."""
+        from app.config import settings
+
+        self.host = settings.mysql_host if host is None else host
+        self.database = settings.mysql_database if database is None else database
+        self.user = settings.mysql_user if user is None else user
+        self.password = settings.mysql_password if password is None else password
         self.connection = None
     
     def connect(self):
