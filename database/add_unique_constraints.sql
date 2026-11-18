@@ -1,7 +1,7 @@
 -- Add UNIQUE constraints to prevent future duplicates
 -- Run this ONCE only after database schema is created
 
-USE copilot_rssi;
+-- Sélectionnez votre base MySQL avant d’exécuter ce script.
 
 -- Add UNIQUE constraint on documents.file_path (better than file_name for same files in different folders)
 -- Drop constraint if exists first to avoid errors on re-run
