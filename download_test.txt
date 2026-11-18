@@ -1,15 +1,13 @@
-FICHE EMPLOYE - DOSSIER RH - CONFIDENTIEL
+FICHE EMPLOYÉ — MODÈLE DE TEST
 
-Nom: Sara El Amrani
-CIN: CD789012
-CNSS: 1234567890
-Email: sara.elamrani@entreprise.ma
-Telephone: 06 98 76 54 32
-Adresse: 45 Boulevard Zerktouni, Casablanca
+Nom : [nom de test]
+CIN : [identifiant fictif]
+CNSS : [numéro fictif]
+E-mail : [adresse de test]
+Téléphone : [numéro fictif]
+Adresse : [adresse fictive]
 
-Poste: Analyste Securite SI
-Departement: Informatique
-Salaire brut: 9500 MAD
-Date embauche: 15/03/2024
-
-Document a usage interne uniquement.
+Poste : [poste de test]
+Département : [département de test]
+Salaire brut : [montant fictif]
+Date d’embauche : [date de test]
