@@ -1,99 +1,58 @@
-# تعليمات تشغيل Backend
+# Guide de démarrage du backend
 
-## الخطوة 0: متطلبات النظام
-- Python 3.11+
-- Maven (للـ Java Backend)
-- MySQL Server
+## 1. Prérequis
 
-## الخطوة 1: تشغيل Python AI Service (الخدمة الرئيسية)
+- Python 3.11 ou plus récent
+- Java 17 et Maven pour le backend Spring Boot
+- MySQL et Node.js
 
-من مجلد المشروع الرئيسي (`d:\Stage_IA`):
+## 2. Démarrer le service IA Python
 
-### تشغيل بدون Hot Reload (الإنتاج)
+Ouvrez PowerShell à la racine de votre copie du projet. Pour activer le rechargement automatique en développement, ajoutez l’option `--reload` à la commande.
+
 ```powershell
-cd d:\Stage_IA
 python start_backend.py --host 127.0.0.1 --port 8000
 ```
 
-### تشغيل مع Hot Reload (التطوير)
+La documentation OpenAPI est disponible sur http://127.0.0.1:8000/docs. Pour vérifier le service, ouvrez http://127.0.0.1:8000/api/v1/health.
+
+## 3. Démarrer le backend Java
+
+Dans PowerShell, vérifiez Maven avec `mvn --version`. Définissez `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` et `JWT_SECRET` avec les valeurs de votre installation.
+
+Depuis la racine du projet, exécutez ces commandes.
+
 ```powershell
-cd d:\Stage_IA
-python start_backend.py --host 127.0.0.1 --port 8000 --reload
-```
-
-الخدمة ستكون متاحة على: `http://127.0.0.1:8000`
-- OpenAPI Docs: `http://127.0.0.1:8000/docs`
-- API endpoints: `/api/v1/analyze`, `/api/v1/chat`
-
-### التحقق من تشغيل الخدمة
-```powershell
-$health = Invoke-RestMethod -Uri 'http://127.0.0.1:8000/api/v1/health'
-Write-Host "Status: $($health.status)"
-```
-
----
-
-## الخطوة 2: تأكد من تثبيت Maven (اختياري - للـ Java Backend)
-تحقق من تثبيت Maven على جهازك عن طريق تشغيل الأمر التالي في PowerShell:
-```powershell
-mvn --version
-```
-
-إذا لم يكن Maven مثبتاً، قم بتثبيته من: https://maven.apache.org/download.cgi
-
-## الخطوة 3: تشغيل Java Backend (اختياري)
-
-### الطريقة 1: باستخدام Maven (الموصى بها)
-افتح PowerShell وانتقل إلى مجلد Backend:
-```powershell
-cd d:\Stage_IA\Backend_IA
+cd Backend_IA
 mvn spring-boot:run
 ```
 
-### الطريقة 2: باستخدام IDE (IntelliJ IDEA أو Eclipse)
-1. افتح المشروع في IntelliJ IDEA أو Eclipse
-2. ابحث عن الملف الرئيسي: `src/main/java/com/copilot/rssi/RssiApplication.java`
-3. انقر بزر الماوس الأيمن على الملف واختر "Run 'RssiApplication'"
+Avec IntelliJ IDEA ou Eclipse, ouvrez `Backend_IA` et lancez `CopilotRssiApplication`. Pour vérifier le backend, ouvrez http://localhost:8080/api/health.
 
-## الخطوة 4: التحقق من تشغيل Backend
-بعد التشغيل، سترى رسالة مثل:
-```
-Started RssiApplication in X.XXX seconds
-```
+## 4. Démarrer le frontend
 
-يمكنك أيضاً التحقق من تشغيل Backend عن طريق فتح المتصفح على:
-http://localhost:8080/api/health
+Ouvrez un nouveau terminal PowerShell à la racine du projet.
 
-## الخطوة 5: تشغيل Frontend
-افتح PowerShell جديد وانتقل إلى مجلد Frontend:
 ```powershell
-cd d:\Stage_IA\Frontend_IA
+cd Frontend_IA
+npm install
 npm run dev
 ```
 
-## الخطوة 6: الوصول إلى التطبيق
-افتح المتصفح على:
-http://localhost:5173
+Ouvrez http://localhost:5173 dans votre navigateur.
 
-## إعداد حسابات تسجيل الدخول
+## Configurer les comptes de connexion
 
-- حساب الإدارة: عيّن `BOOTSTRAP_ADMIN_USERNAME` و`BOOTSTRAP_ADMIN_PASSWORD` و`BOOTSTRAP_ADMIN_EMAIL` قبل تشغيل Backend.
-- حساب RSSI: عيّن `BOOTSTRAP_RSSI_USERNAME` و`BOOTSTRAP_RSSI_PASSWORD` و`BOOTSTRAP_RSSI_EMAIL`.
+Renseignez les trois variables du compte à créer avant de lancer le backend Java.
 
- حل المشاكل الشائعة
+| Compte | Nom d’utilisateur | Mot de passe | Adresse e-mail |
+| --- | --- | --- | --- |
+| Administrateur | `BOOTSTRAP_ADMIN_USERNAME` | `BOOTSTRAP_ADMIN_PASSWORD` | `BOOTSTRAP_ADMIN_EMAIL` |
+| RSSI | `BOOTSTRAP_RSSI_USERNAME` | `BOOTSTRAP_RSSI_PASSWORD` | `BOOTSTRAP_RSSI_EMAIL` |
 
-### مشكلة IA Service: `ModuleNotFoundError: No module named 'app'`
-**الحل:** تأكد من تشغيل الخدمة باستخدام `start_backend.py` من مجلد المشروع الرئيسي:
-```powershell
-cd d:\Stage_IA
-python start_backend.py
-```
+## Dépannage
 
-### المشكلة: صفحة بيضاء بعد تسجيل الدخول
-**الحل:** تأكد من أن Backend يعمل على http://localhost:8080
-
-### المشكلة: خطأ اتصال
-**الحل:** تحقق من أن Backend يعمل وأن المنفذ 8080 غير مستخدم من قبل تطبيق آخر
-
-### المشكلة: خطأ في قاعدة البيانات
-**الحل:** تأكد من أن MySQL يعمل وأن قاعدة البيانات التي اخترتها في `DB_URL` و`MYSQL_DATABASE` موجودة.
+- Si le service IA affiche `ModuleNotFoundError: No module named 'app'`, lancez `python start_backend.py` à la racine du projet.
+- Si une page blanche apparaît après la connexion, vérifiez que le backend Java répond sur http://localhost:8080/api/health.
+- Si le backend ne démarre pas, vérifiez que le port 8080 est libre.
+- Si MySQL refuse la connexion, vérifiez les identifiants et assurez-vous que `DB_URL` et `MYSQL_DATABASE` désignent la base que vous avez créée.
