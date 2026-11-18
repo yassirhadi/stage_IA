@@ -238,3 +238,10 @@ Copilot RSSI est une plateforme intelligente développée dans le cadre d'un sta
 Le projet vise à faciliter le travail du Responsable de la Sécurité des Systèmes d'Information (RSSI) grâce à l'automatisation de l'inventaire documentaire, de la détection des données sensibles et de l'analyse des risques.
 
 L'intelligence artificielle intervient comme outil d'assistance à la décision, tandis que le RSSI conserve la responsabilité des décisions de sécurité.
+
+
+### Configuration à renseigner sur votre machine
+
+Choisissez votre propre base MySQL. Indiquez son nom dans votre URL JDBC `DB_URL` et dans `MYSQL_DATABASE`. Renseignez votre utilisateur et mot de passe dans `DB_USERNAME` et `DB_PASSWORD`, puis définissez une clé `JWT_SECRET` propre à votre installation.
+
+Pour le service IA, copiez `IA/.env.example` vers `IA/.env`, puis renseignez `MYSQL_USER`, `MYSQL_PASSWORD` et `MYSQL_DATABASE`. Renseignez `OPENAI_API_KEY` si vous utilisez OpenAI. Gardez les valeurs personnelles sur votre machine.
