@@ -60,7 +60,7 @@
 |-----------|--------|---------|
 | Frontend | ✅ SUCCESS | npm build: 0 errors, 2.33s |
 | Backend | ✅ SUCCESS | JAR compiled, startup: 16.73s |
-| Database | ✅ CONNECTED | MySQL copilot_rssi active |
+| Database | ✅ CONNECTED | MySQL was available during verification |
 | Authentication | ✅ WORKING | JWT tokens generated |
 
 ### Endpoint Testing (With JWT)
@@ -226,7 +226,7 @@ Invoke-RestMethod -Uri "http://localhost:8080/api/health"
 ### With Authentication
 ```powershell
 # Login
-$login = @{username="rssi";password="rssi123"} | ConvertTo-Json
+$login = @{ username = $env:BOOTSTRAP_ADMIN_USERNAME; password = $env:BOOTSTRAP_ADMIN_PASSWORD } | ConvertTo-Json
 $auth = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" `
   -Method POST -ContentType 'application/json' -Body $login
 
