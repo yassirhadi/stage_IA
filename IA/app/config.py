@@ -9,9 +9,9 @@ class Settings(BaseSettings):
     port: int = 8000
     mysql_host: str = "localhost"
     mysql_port: int = 3306
-    mysql_user: str = "root"
+    mysql_user: str = ""
     mysql_password: str = ""
-    mysql_database: str = "copilot_rssi"
+    mysql_database: str = ""
     backend_base_url: str = "http://localhost:8080/api"
 
     # LLM Configuration
