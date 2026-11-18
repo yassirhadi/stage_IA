@@ -235,8 +235,8 @@ mysql -u root -p < database/schema.sql
 
 ## 8. DEFAULT CREDENTIALS
 
-- **admin** / **admin123** (ADMIN role)
-- **rssi** / **rssi123** (RSSI role)
+- ADMIN: utilisez les identifiants définis par vos variables `BOOTSTRAP_ADMIN_*`.
+- RSSI: utilisez les identifiants définis par vos variables `BOOTSTRAP_RSSI_*`.
 
 ---
 
