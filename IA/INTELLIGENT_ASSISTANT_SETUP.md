@@ -321,9 +321,10 @@ OPENAI_MODEL=gpt-4o-mini
 # Database Configuration
 MYSQL_HOST=localhost
 MYSQL_PORT=3306
-MYSQL_USER=root
-MYSQL_PASSWORD=your_password
-MYSQL_DATABASE=copilot_rssi
+# Renseignez les trois valeurs de votre propre installation MySQL.
+MYSQL_USER=
+MYSQL_PASSWORD=
+MYSQL_DATABASE=
 ```
 
 ## Performance Tips
