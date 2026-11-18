@@ -75,17 +75,12 @@ npm run dev
 افتح المتصفح على:
 http://localhost:5173
 
-## بيانات تسجيل الدخول الافتراضية
+## إعداد حسابات تسجيل الدخول
 
-### حساب Admin
-- المستخدم: `admin`
-- كلمة المرور: `admin123`
+- حساب الإدارة: عيّن `BOOTSTRAP_ADMIN_USERNAME` و`BOOTSTRAP_ADMIN_PASSWORD` و`BOOTSTRAP_ADMIN_EMAIL` قبل تشغيل Backend.
+- حساب RSSI: عيّن `BOOTSTRAP_RSSI_USERNAME` و`BOOTSTRAP_RSSI_PASSWORD` و`BOOTSTRAP_RSSI_EMAIL`.
 
-### حساب RSSI
-- المستخدم: `rssi`
-- كلمة المرور: `rssi123`
-
-## حل المشاكل الشائعة
+ حل المشاكل الشائعة
 
 ### مشكلة IA Service: `ModuleNotFoundError: No module named 'app'`
 **الحل:** تأكد من تشغيل الخدمة باستخدام `start_backend.py` من مجلد المشروع الرئيسي:
@@ -101,4 +96,4 @@ python start_backend.py
 **الحل:** تحقق من أن Backend يعمل وأن المنفذ 8080 غير مستخدم من قبل تطبيق آخر
 
 ### المشكلة: خطأ في قاعدة البيانات
-**الحل:** تأكد من أن MySQL يعمل وأن قاعدة البيانات `copilot_rssi` موجودة
+**الحل:** تأكد من أن MySQL يعمل وأن قاعدة البيانات التي اخترتها في `DB_URL` و`MYSQL_DATABASE` موجودة.
