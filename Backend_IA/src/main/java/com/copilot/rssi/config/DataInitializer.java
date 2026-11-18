@@ -124,7 +124,7 @@ public class DataInitializer implements CommandLineRunner {
         seedAsset("Firewall Fortinet", AssetType.MATERIEL, "Pare-feu périmétrique", Criticality.CRITIQUE);
         seedAsset("ERP Interne", AssetType.LOGICIEL, "Application ERP", Criticality.ELEVEE);
         seedAsset("Antivirus EDR", AssetType.LOGICIEL, "Solution endpoint protection", Criticality.ELEVEE);
-        seedAsset("Base MySQL copilot_rssi", AssetType.LOGICIEL, "Base de données applicative", Criticality.ELEVEE);
+                seedAsset("Base MySQL applicative", AssetType.LOGICIEL, "Base de données configurée dans DB_URL", Criticality.ELEVEE);
         seedAsset("Politique SSI", AssetType.ORGANISATIONNEL, "Document de gouvernance SSI", Criticality.CRITIQUE);
     }
 
