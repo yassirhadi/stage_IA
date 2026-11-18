@@ -138,8 +138,8 @@ mysql -u root -p < database/schema.sql
 
 ## Default Users
 
-- **admin** / **admin123** (ADMIN role)
-- **rssi** / **rssi123** (RSSI role)
+- ADMIN: utilisez les identifiants définis par vos variables `BOOTSTRAP_ADMIN_*`.
+- RSSI: utilisez les identifiants définis par vos variables `BOOTSTRAP_RSSI_*`.
 
 ## Initial Data
 
