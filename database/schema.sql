@@ -1,9 +1,6 @@
 -- Copilot RSSI - Schéma MySQL
-CREATE DATABASE IF NOT EXISTS copilot_rssi
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE copilot_rssi;
+-- Créez une base MySQL avec le nom de votre choix et sélectionnez-la avant
+-- d’exécuter ce script. Utilisez utf8mb4 et la collation utf8mb4_unicode_ci.
 
 -- Rôles
 CREATE TABLE IF NOT EXISTS roles (
